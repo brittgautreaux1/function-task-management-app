@@ -22,7 +22,6 @@ namespace TaskManagementApi.Entities
         
         public DateTime? UpdatedAt { get; set; }
 
-        // owner/creator
-        // public string? UserId { get; set; } 
+        public string? UserId { get; set; }
     }
 }

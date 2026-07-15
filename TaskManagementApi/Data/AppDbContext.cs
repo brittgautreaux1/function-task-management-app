@@ -8,6 +8,7 @@ namespace TaskManagementApi.Data
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
         public DbSet<Entities.Task> Tasks { get; set; } = null!;
+        public DbSet<User> Users { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -15,8 +16,7 @@ namespace TaskManagementApi.Data
 
             modelBuilder.Entity<Entities.Task>(entity =>
             {
-                // TODO
-                // entity.HasIndex(t => t.UserId); // For future auth
+                entity.HasIndex(t => t.UserId);
             });
         }
     }

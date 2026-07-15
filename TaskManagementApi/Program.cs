@@ -1,15 +1,49 @@
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using TaskManagementApi.Data;
+using TaskManagementApi.Entities;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddControllers();
 
 // Register DbContext with SQLite
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+// Add Identity Services
+builder.Services.AddIdentity<User, IdentityRole>()
+    .AddEntityFrameworkStores<AppDbContext>()
+    .AddDefaultTokenProviders();
+
+var jwtSettings = builder.Configuration.GetSection("Jwt");
+var jwtKey = Encoding.UTF8.GetBytes(jwtSettings["Key"]!);
+// Add JWT Validation Services
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(jwtKey)
+    };
+});
+
+builder.Services.AddAuthorization();
 
 // CORS - Allow frontend (update origin later when frontend is running)
 builder.Services.AddCors(options =>
@@ -35,8 +69,8 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseCors();
 
-// Simple global error handler
-app.UseExceptionHandler("/error"); // Basic for now
+app.UseAuthentication();
+app.UseAuthorization();
 
 // Ensure database is created and migrated
 using (var scope = app.Services.CreateScope())
@@ -46,6 +80,7 @@ using (var scope = app.Services.CreateScope())
     context.Database.EnsureCreated();   // Creates DB + tables on first run
 }
 
+app.MapControllers();
 app.MapGet("/", () => "Task Management API is running!");
 
 app.Run();
