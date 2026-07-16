@@ -64,15 +64,16 @@
     success.value = '';
   
     try {
-      await api.post('/auth/register', {
+      const response = await api.post('/auth/register', {
         email: form.value.email,
         password: form.value.password
       });
   
-      success.value = "Account created successfully! Redirecting to login...";
-      
+      success.value = "Account created successfully!";
+
+      localStorage.setItem('token', response.data.token);
       setTimeout(() => {
-        router.push('/login');
+        router.push('/tasks');
       }, 1500);
     } catch (err: any) {
       error.value = err.response?.data?.message || 'Registration failed';

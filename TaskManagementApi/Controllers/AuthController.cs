@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
@@ -6,6 +7,7 @@ using System.Security.Claims;
 using System.Text;
 using TaskManagementApi.DTOs;
 using TaskManagementApi.Entities;
+using TaskManagementApi.Extensions;
 
 namespace TaskManagementApi.Controllers;
 
@@ -72,6 +74,17 @@ public class AuthController : ControllerBase
                 email = user.Email 
             }
         });
+    }
+    
+    [Authorize]
+    [HttpGet("user")]
+    public IActionResult GetUserProfile()
+    {
+        var userId = User.GetUserId();
+
+        if (userId == null) return Unauthorized();
+
+        return Ok(new { UserId = userId });
     }
 
     private string GenerateJwtToken(User user)
