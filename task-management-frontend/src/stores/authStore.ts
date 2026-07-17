@@ -11,10 +11,26 @@ interface User {
 export const useAuthStore = defineStore('auth', {
     state: () => ({
         user: {} as User | null,
-        token: null,
+        token: localStorage.getItem('token') || null,
         error: ''
     }),
+    getters: {
+        isAuthenticated: (state) => !!state.token && !!state.user
+    },
     actions: {
+        async restoreUser() {
+            if (!this.token) return false;
+
+            try {
+                const response = await api.get('/auth/user');  // Use your existing endpoint
+                this.user = response.data;
+                return true;
+            } catch (err) {
+                console.log('Failed to restore user');
+                this.logout();  // Clear invalid token
+                return false;
+            }
+        },
         async login(email: string, password: string) {
             this.error = '';
 

@@ -36,7 +36,8 @@ namespace TaskManagementApi.Controllers
                     Description = t.Description,
                     IsCompleted = t.IsCompleted,
                     DueDate = t.DueDate,
-                    CreatedAt = t.CreatedAt
+                    CreatedAt = t.CreatedAt,
+                    UpdatedAt = t.UpdatedAt
                 })
                 .ToListAsync();
 
@@ -103,18 +104,18 @@ namespace TaskManagementApi.Controllers
             return NoContent();
         }
 
-        // // PATCH: api/tasks/5/complete
-        // [HttpPatch("{id}/complete")]
-        // public async Task<IActionResult> ToggleComplete(int id)
-        // {
-        //     var task = await _context.Tasks.FindAsync(id);
-        //     if (task == null) return NotFound();
+        // PATCH: api/tasks/5/complete
+        [HttpPatch("{id}/complete")]
+        public async Task<IActionResult> ToggleComplete(int id)
+        {
+            var task = await _context.Tasks.FindAsync(id);
+            if (task == null) return NotFound();
 
-        //     task.IsCompleted = !task.IsCompleted;
-        //     task.UpdatedAt = DateTime.UtcNow;
+            task.IsCompleted = !task.IsCompleted;
+            task.UpdatedAt = DateTime.UtcNow;
 
-        //     await _context.SaveChangesAsync();
-        //     return Ok(task);
-        // }
+            await _context.SaveChangesAsync();
+            return Ok(task);
+        }
     }
 }

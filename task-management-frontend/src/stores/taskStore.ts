@@ -73,10 +73,12 @@ export const useTaskStore = defineStore('tasks', {
     },
     async toggleComplete(id: number) {
       try {
-        await api.patch(`/tasks/${id}/complete`);
+        await api.patch(`/Tasks/${id}/complete`);
         await this.loadTasks();
+        return true;
       } catch (err) {
         console.error(err);
+        return false;
       }
     }
   }

@@ -2,8 +2,7 @@
   <div class="tasks-page">
     <header class="header">
       <h1>My Tasks ({{ filteredTasks.length }})</h1>
-      <button @click="createTask" class="btn-primary">+ New Task</button>
-      <button @click="logout()" class="btn-primary">Logout</button>
+      <button @click="createTask" class="btn-primary new-task-btn">+ New Task</button>
     </header>
 
     <div class="controls">
@@ -28,7 +27,7 @@
       <tbody>
         <tr v-for="task in paginatedTasks" :key="task.id" :class="{ completed: task.isCompleted }">
           <td>
-            <input type="checkbox" :checked="task.isCompleted" @change="taskStore.toggleComplete(task.id)" />
+            <input type="checkbox" :checked="task.isCompleted" @change="toggleComplete(task.id)" />
           </td>
           <td><strong>{{ task.title }}</strong></td>
           <td>{{ task.description || '—' }}</td>
@@ -70,11 +69,8 @@ import { ref, computed, onMounted } from 'vue';
 import { useTaskStore } from '@/stores/taskStore';
 import TaskFormModal from '@/components/tasks/TaskFormModal.vue';
 import LoadingModal from '@/components/LoadingModal.vue';
-import { useAuthStore } from '@/stores/authStore';
-import router from '@/router';
 import type { TaskForm } from '@/models/task';
 
-const authStore = useAuthStore();
 const taskStore = useTaskStore();
 
 const searchQuery = ref('');
@@ -150,9 +146,15 @@ const deleteTask = async (id: number) => {
   isLoading.value = false;
 }
 
-const logout = () => {
-  authStore.logout();
-  router.push('/login');
+const toggleComplete = async (id: number) => {
+  isLoading.value = true;
+
+  const result = await taskStore.toggleComplete(id);
+  if (!result) {
+    alert('Failed to delete task. Please try again.');
+  }
+
+  isLoading.value = false;
 }
 
 onMounted(() => {
@@ -210,7 +212,7 @@ onMounted(() => {
   font-weight: 600;
 }
 
-.completed {
+.completed>td:not(.actions-cell) {
   text-decoration: line-through;
   opacity: 0.75;
 }
@@ -260,5 +262,9 @@ onMounted(() => {
 
 .actions-cell {
   display: flex;
+}
+
+.new-task-btn {
+  padding: 6px;
 }
 </style>

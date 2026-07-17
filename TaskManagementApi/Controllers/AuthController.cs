@@ -70,21 +70,33 @@ public class AuthController : ControllerBase
             token,
             user = new 
             { 
-                id = user.Id, 
-                email = user.Email 
+                Id = user.Id, 
+                Email = user.Email,
+                FirstName = user.FirstName,
+                LastName = user.LastName
             }
         });
     }
-    
+
     [Authorize]
     [HttpGet("user")]
-    public IActionResult GetUserProfile()
+    public async Task<IActionResult> GetUserProfile()
     {
         var userId = User.GetUserId();
+        if (string.IsNullOrEmpty(userId)) 
+            return Unauthorized();
 
-        if (userId == null) return Unauthorized();
+        var user = await _userManager.FindByIdAsync(userId);
+        if (user == null) 
+            return NotFound();
 
-        return Ok(new { UserId = userId });
+        return Ok(new 
+        { 
+            id = user.Id,
+            email = user.Email,
+            firstName = user.FirstName,
+            lastName = user.LastName
+        });
     }
 
     private string GenerateJwtToken(User user)
