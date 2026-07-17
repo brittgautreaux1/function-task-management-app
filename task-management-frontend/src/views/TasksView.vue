@@ -1,7 +1,7 @@
 <template>
   <div class="tasks-page">
     <header class="header">
-      <h1>My Tasks ({{ filteredTasks.length }})</h1>
+      <h1>My Functional Tasks ({{ filteredTasks.length }})</h1>
       <button @click="createTask" class="btn-primary new-task-btn">+ New Task</button>
     </header>
 

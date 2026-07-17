@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { useRouter } from 'vue-router';
 
 const api = axios.create({
   baseURL: 'http://localhost:5155/api',   // Update port if yours is different
@@ -6,6 +7,8 @@ const api = axios.create({
     'Content-Type': 'application/json',
   },
 });
+
+const router = useRouter();
 
 // Optional: Add token interceptor later
 api.interceptors.request.use(config => {
@@ -20,9 +23,10 @@ api.interceptors.request.use(config => {
 api.interceptors.response.use(
   response => response,
   error => {
-    if (error.response?.status === 401) {
+    const isAuthEndpoint = error.config?.url?.includes('/login') || error.config?.url?.includes('/auth/register');
+    if (error.response?.status === 401 && !isAuthEndpoint) {
       localStorage.removeItem('token');
-      window.location.href = '/login';
+      router.push('/login');
     }
     return Promise.reject(error);
   }

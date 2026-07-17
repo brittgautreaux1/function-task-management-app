@@ -1,6 +1,6 @@
 <template>
   <div class="login-container">
-    <h1>Task Manager</h1>
+    <h1>Functional Task Manager</h1>
     <form @submit.prevent="handleLogin">
       <input v-model="email" type="email" placeholder="Email" required />
       <input v-model="password" type="password" placeholder="Password" required />

@@ -61,17 +61,15 @@ const handleRegister = async () => {
   if (result) {
     success.value = "Account created successfully!";
 
-    setTimeout(() => {
-      router.push('/tasks');
-    }, 1500);
+    router.push('/tasks');
   }
   else {
     //todo: handle existing email
     console.log(authStore.error);
     error.value = authStore.error || 'Registration failed';
+    loading.value = false;
   }
 
-  loading.value = false;
 };
 </script>
   

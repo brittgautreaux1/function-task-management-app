@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia';
 import api from '@/services/api';
 import type { TaskForm, Task } from '@/models/task';
+import { parseApiError } from '@/utils/api';
 
 export const useTaskStore = defineStore('tasks', {
   state: () => ({
@@ -17,8 +18,8 @@ export const useTaskStore = defineStore('tasks', {
         const response = await api.get('/tasks');
         this.tasks = response.data;
       } catch (err: any) {
-        this.error = 'Failed to load tasks';
-        console.error(err);
+        console.log(err);
+        this.error = parseApiError(err);
       } finally {
         this.loading = false;
       }
@@ -32,8 +33,8 @@ export const useTaskStore = defineStore('tasks', {
         await this.loadTasks();
         return true;
       } catch (err: any) {
-        console.error(err.response?.data);
-        this.error = err.response?.data || 'Create Task failed';
+        console.log(err);
+        this.error = parseApiError(err);
         return false;
       } finally {
         this.loading = false;
@@ -49,8 +50,8 @@ export const useTaskStore = defineStore('tasks', {
         await this.loadTasks();
         return true;
       } catch (err: any) {
-        console.error(err);
-        this.error = err.response?.data || 'Update Task failed';
+        console.log(err);
+        this.error = parseApiError(err);
         return false;
       } finally {
         this.loading = false;
@@ -64,8 +65,9 @@ export const useTaskStore = defineStore('tasks', {
         await api.delete(`/Tasks/${id}`);
         await this.loadTasks();
         return true;
-      } catch (err) {
-        console.error(err);
+      } catch (err: any) {
+        console.log(err);
+        this.error = parseApiError(err);
         return false;
       } finally {
         this.loading = false;
@@ -76,8 +78,9 @@ export const useTaskStore = defineStore('tasks', {
         await api.patch(`/Tasks/${id}/complete`);
         await this.loadTasks();
         return true;
-      } catch (err) {
-        console.error(err);
+      } catch (err: any) {
+        console.log(err);
+        this.error = parseApiError(err);
         return false;
       }
     }

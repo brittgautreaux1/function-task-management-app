@@ -4,7 +4,7 @@
     <header class="header">
       <div class="header-content">
         <div class="logo-text">
-          <h1>TaskFlow</h1>
+          <h1>Functional Task Manager</h1>
         </div>
 
         <nav class="nav">

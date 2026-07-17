@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia';
 import api from '@/services/api';
+import { parseApiError } from '@/utils/api';
 
 interface User {
     id: string;
@@ -25,8 +26,9 @@ export const useAuthStore = defineStore('auth', {
                 const response = await api.get('/auth/user');  // Use your existing endpoint
                 this.user = response.data;
                 return true;
-            } catch (err) {
-                console.log('Failed to restore user');
+            } catch (err: any) {
+                console.log(err);
+                this.error = parseApiError(err);
                 this.logout();  // Clear invalid token
                 return false;
             }
@@ -44,7 +46,8 @@ export const useAuthStore = defineStore('auth', {
 
                 return true;
             } catch (err: any) {
-                this.error = err.response?.data?.message || 'Login failed';
+                console.log(err);
+                this.error = parseApiError(err);
                 return false;
             }
         },
@@ -60,8 +63,8 @@ export const useAuthStore = defineStore('auth', {
 
                 return true;
             } catch (err: any) {
-                console.log(err.response);
-                this.error = err.response?.data || 'Registration failed';
+                console.log(err);
+                this.error = parseApiError(err);
                 return false;
             }
         },
