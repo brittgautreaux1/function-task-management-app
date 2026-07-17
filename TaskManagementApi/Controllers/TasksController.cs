@@ -46,14 +46,13 @@ namespace TaskManagementApi.Controllers
 
         // // POST: api/tasks
         [HttpPost]
-        [ProducesResponseType(StatusCodes.Status201Created)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<Task>> CreateTask(CreateTaskDto dto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
             var userId = User.GetUserId();
+            if (string.IsNullOrEmpty(userId)) return Unauthorized(); 
 
             var task = new Task
             {
@@ -74,16 +73,18 @@ namespace TaskManagementApi.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateTask(int id, UpdateTaskDto dto)
         {
-            var task = await _context.Tasks.FindAsync(id);
+            var userId = User.GetUserId();
+            if (string.IsNullOrEmpty(userId)) return Unauthorized();
+
+            var task = await _context.Tasks.FirstOrDefaultAsync(t => t.Id == id && t.UserId == userId);
             if (task == null) return NotFound();
 
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            if (dto.Title != null) task.Title = dto.Title;
-            if (dto.Description != null) task.Description = dto.Description;
-            if (dto.IsCompleted.HasValue) task.IsCompleted = dto.IsCompleted.Value;
-            if (dto.DueDate.HasValue) task.DueDate = dto.DueDate;
+            task.Title = dto.Title;
+            task.Description = dto.Description;
+            task.DueDate = dto.DueDate;
 
             task.UpdatedAt = DateTime.UtcNow;
 
@@ -95,7 +96,10 @@ namespace TaskManagementApi.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteTask(int id)
         {
-            var task = await _context.Tasks.FindAsync(id);
+            var userId = User.GetUserId();
+            if (string.IsNullOrEmpty(userId)) return Unauthorized();
+ 
+            var task = await _context.Tasks.FirstOrDefaultAsync(t => t.Id == id && t.UserId == userId);
             if (task == null) return NotFound();
 
             _context.Tasks.Remove(task);
@@ -108,7 +112,10 @@ namespace TaskManagementApi.Controllers
         [HttpPatch("{id}/complete")]
         public async Task<IActionResult> ToggleComplete(int id)
         {
-            var task = await _context.Tasks.FindAsync(id);
+            var userId = User.GetUserId();
+            if (string.IsNullOrEmpty(userId)) return Unauthorized();
+ 
+            var task = await _context.Tasks.FirstOrDefaultAsync(t => t.Id == id && t.UserId == userId);
             if (task == null) return NotFound();
 
             task.IsCompleted = !task.IsCompleted;

@@ -33,7 +33,7 @@ public class AuthController : ControllerBase
 
         var existingUser = await _userManager.FindByEmailAsync(dto.Email);
         if (existingUser != null)
-            return BadRequest("Email already exists");
+            return BadRequest(new { message = "Email already exists" });
 
         var user = new User 
         {
@@ -49,7 +49,19 @@ public class AuthController : ControllerBase
         if (!result.Succeeded)
             return BadRequest(result.Errors);
 
-        return Ok(new { message = "User registered successfully" });
+        var token = GenerateJwtToken(user);
+
+        return Ok( new 
+        {
+            token,
+            user = new
+            {
+                Id = user.Id,
+                Email = user.Email,
+                FirstName = user.FirstName,
+                LastName = user.LastName
+            }
+        });
     }
 
     // POST: api/auth/login
@@ -61,7 +73,7 @@ public class AuthController : ControllerBase
 
         var user = await _userManager.FindByEmailAsync(dto.Email);
         if (user == null || !await _userManager.CheckPasswordAsync(user, dto.Password))
-            return Unauthorized("Invalid email or password");
+            return Unauthorized(new { message = "Invalid email or password" });
 
         var token = GenerateJwtToken(user);
 
