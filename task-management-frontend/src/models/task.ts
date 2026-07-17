@@ -9,8 +9,9 @@ export interface Task {
     userId?: string;
 }
 
-export interface CreateTaskForm {
+export interface TaskForm {
+    id?: number;
     title: string;
     description?: string;
     dueDate?: string;
-  }
+}

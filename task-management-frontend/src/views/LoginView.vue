@@ -4,7 +4,7 @@
     <form @submit.prevent="handleLogin">
       <input v-model="email" type="email" placeholder="Email" required />
       <input v-model="password" type="password" placeholder="Password" required />
-      <button type="submit" :disabled="loading">Login</button>
+      <button type="submit" :disabled="loading || disableLogin">Login</button>
     </form>
     <p v-if="error" style="color: red;">{{ error }}</p>
     <p>Don't have an account? <router-link to="/register">Sign up</router-link></p>
@@ -14,32 +14,30 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
-import api from '@/services/api';
+import { useAuthStore } from '@/stores/authStore';
+import { computed } from 'vue';
+
+const authStore = useAuthStore();
 
 const router = useRouter();
 const email = ref('');
 const password = ref('');
 const loading = ref(false);
 const error = ref('');
+const disableLogin = computed(() => !email.value || !password.value);
 
 const handleLogin = async () => {
   loading.value = true;
-  error.value = '';
 
-  try {
-    // TODO: Replace with your actual login endpoint when ready
-    const response = await api.post('/auth/login', {
-      email: email.value,
-      password: password.value
-    });
-    
-    localStorage.setItem('token', response.data.token);
+  const result = await authStore.login(email.value, password.value);
+  if (result) {
     router.push('/tasks');
-  } catch (err: any) {
-    error.value = err.response?.data?.message || 'Login failed';
-  } finally {
-    loading.value = false;
   }
+  else {
+    error.value = authStore.error;
+  }
+
+  loading.value = false;
 };
 </script>
 

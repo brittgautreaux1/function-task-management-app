@@ -40,7 +40,7 @@ input {
   border-radius: 6px;
 }
 
-button {
+button:not(:disabled) {
   background: #007bff;
   color: white;
   border: none;

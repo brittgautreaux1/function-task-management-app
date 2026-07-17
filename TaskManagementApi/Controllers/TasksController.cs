@@ -43,14 +43,6 @@ namespace TaskManagementApi.Controllers
             return tasks;
         }
 
-        // // GET: api/tasks/5
-        // [HttpGet("{id}")]
-        // public async Task<ActionResult<Task>> GetTask(int id)
-        // {
-        //     var task = await _context.Tasks.FindAsync(id);
-        //     return task is null ? NotFound() : Ok(task);
-        // }
-
         // // POST: api/tasks
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
@@ -74,42 +66,42 @@ namespace TaskManagementApi.Controllers
             _context.Tasks.Add(task);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction(nameof(Task), new { id = task.Id }, task);
+            return Ok(task);
         }
 
         // // PUT: api/tasks/5
-        // [HttpPut("{id}")]
-        // public async Task<IActionResult> UpdateTask(int id, UpdateTaskDto dto)
-        // {
-        //     var task = await _context.Tasks.FindAsync(id);
-        //     if (task == null) return NotFound();
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateTask(int id, UpdateTaskDto dto)
+        {
+            var task = await _context.Tasks.FindAsync(id);
+            if (task == null) return NotFound();
 
-        //     if (!ModelState.IsValid)
-        //         return BadRequest(ModelState);
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
 
-        //     if (dto.Title != null) task.Title = dto.Title;
-        //     if (dto.Description != null) task.Description = dto.Description;
-        //     if (dto.IsCompleted.HasValue) task.IsCompleted = dto.IsCompleted.Value;
-        //     if (dto.DueDate.HasValue) task.DueDate = dto.DueDate;
+            if (dto.Title != null) task.Title = dto.Title;
+            if (dto.Description != null) task.Description = dto.Description;
+            if (dto.IsCompleted.HasValue) task.IsCompleted = dto.IsCompleted.Value;
+            if (dto.DueDate.HasValue) task.DueDate = dto.DueDate;
 
-        //     task.UpdatedAt = DateTime.UtcNow;
+            task.UpdatedAt = DateTime.UtcNow;
 
-        //     await _context.SaveChangesAsync();
-        //     return NoContent();
-        // }
+            await _context.SaveChangesAsync();
+            return NoContent();
+        }
 
         // // DELETE: api/tasks/5
-        // [HttpDelete("{id}")]
-        // public async Task<IActionResult> DeleteTask(int id)
-        // {
-        //     var task = await _context.Tasks.FindAsync(id);
-        //     if (task == null) return NotFound();
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteTask(int id)
+        {
+            var task = await _context.Tasks.FindAsync(id);
+            if (task == null) return NotFound();
 
-        //     _context.Tasks.Remove(task);
-        //     await _context.SaveChangesAsync();
+            _context.Tasks.Remove(task);
+            await _context.SaveChangesAsync();
 
-        //     return NoContent();
-        // }
+            return NoContent();
+        }
 
         // // PATCH: api/tasks/5/complete
         // [HttpPatch("{id}/complete")]
